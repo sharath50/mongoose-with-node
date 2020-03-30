@@ -83,6 +83,71 @@ mongoose.connection.close(() => {
   console.log("connection closed");
 });
 
+// use this proper way to create connection
+mongoose.connect("mongodb://localhost/default");
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "connection error:"));
+db.once("open", () => {
+  console.log("connected");
+});
+
+/**
+ * creating multiple db connection mongoose
+ */
+
+// first approach
+var mongoose = require("mongoose");
+mongoose.connect("mongodb://localhost/foo_db");
+module.exports = exports = mongoose;
+
+var mongoose = require("mongoose");
+mongoose.connect("mongodb://localhost/bar_db");
+module.exports = exports = mongoose;
+
+// models creates here
+var mongoose = require("./foo_db_connect.js");
+
+// models creates here
+var mongoose = require("./bar_db_connect.js");
+
+// second approach
+const connection1 = mongoose.createConnection("mongodb://localhost:27017/mydb");
+const connection2 = mongoose.createConnection(
+  "mongodb://localhost:27017/anotherdb"
+);
+
+var conn = mongoose.createConnection("mongodb://localhost/testA");
+var conn2 = mongoose.createConnection("mongodb://localhost/testB");
+
+// stored in 'testA' database
+var ModelA = conn.model(
+  "Model",
+  new mongoose.Schema({
+    title: { type: String, default: "model in testA database" }
+  })
+);
+
+// stored in 'testB' database
+var ModelB = conn2.model(
+  "Model",
+  new mongoose.Schema({
+    title: { type: String, default: "model in testB database" }
+  })
+);
+
+// third approch to take two instance in one page
+var Mongoose = require("mongoose").Mongoose;
+
+var instance1 = new Mongoose();
+instance1.connect("foo");
+var instance2 = new Mongoose();
+instance2.connect("bar");
+module.exports = { instance1, instance2 };
+
+// inside both apps import like this
+var mongoose = require("mongoose").instance1;
+var mongoose = require("mongoose").instance2;
+
 /**
  * connection object methods
  */
